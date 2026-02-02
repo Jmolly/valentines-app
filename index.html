@@ -402,6 +402,97 @@
         }
       }
 
+      .response-bubble {
+        position: fixed;
+        background: rgba(255, 255, 255, 0.98);
+        padding: 1.2rem 1.8rem;
+        border-radius: 25px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+        font-size: 1.1rem;
+        color: #e91e63;
+        font-weight: 500;
+        pointer-events: none;
+        z-index: 1000;
+        opacity: 0;
+        transform: scale(0.3) translateY(20px);
+        transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        max-width: 280px;
+        text-align: center;
+        line-height: 1.5;
+      }
+
+      .response-bubble.show {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+
+      .response-bubble.hide {
+        opacity: 0;
+        transform: scale(0.3) translateY(-20px);
+        transition: all 0.6s cubic-bezier(0.55, 0.085, 0.68, 0.53);
+      }
+
+      .response-bubble::before {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 12px solid transparent;
+        border-right: 12px solid transparent;
+        border-top: 12px solid rgba(255, 255, 255, 0.98);
+        filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.1));
+      }
+
+      .cats-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInCats 1.2s ease-out 0.5s forwards;
+      }
+
+      @keyframes fadeInCats {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .cat-image {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        border: 5px solid rgba(255, 255, 255, 0.9);
+        animation: catBounce 2s ease-in-out infinite;
+      }
+
+      .cat-image:nth-child(1) {
+        animation-delay: 0s;
+      }
+
+      .cat-image:nth-child(2) {
+        animation-delay: 0.3s;
+      }
+
+      @keyframes catBounce {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-15px) rotate(2deg);
+        }
+      }
+
       @media (max-width: 600px) {
         h1 {
           font-size: 2rem;
@@ -423,6 +514,21 @@
         #noBtn {
           right: 10%;
         }
+
+        .response-bubble {
+          font-size: 1rem;
+          padding: 1rem 1.5rem;
+          max-width: 220px;
+        }
+
+        .cat-image {
+          width: 150px;
+          height: 150px;
+        }
+
+        .cats-container {
+          gap: 1rem;
+        }
       }
     </style>
   </head>
@@ -441,6 +547,10 @@
       <h1>Yay! You made my day! 💕</h1>
       <p>I'm the luckiest person in the world!</p>
       <div class="heart-image">💝</div>
+      <div class="cats-container">
+        <img src="cat-valentine-1.jpg" alt="Cute cat" class="cat-image" />
+        <img src="cat-valentine-2.jpg" alt="Cute cat" class="cat-image" />
+      </div>
     </div>
 
     <button class="music-toggle" id="musicToggle">🎵</button>
@@ -461,6 +571,15 @@
       let isMusicPlaying = false;
       let continuousAnimationsRunning = false;
       let animationIntervals = [];
+      let noClickCount = 0;
+      let currentBubble = null;
+      let bubbleTimeout = null;
+
+      const responses = [
+        "Wrong answer. Think again",
+        "Wrong again. Choose the correct answer",
+        "No, babe! Think again.",
+      ];
 
       // Set initial volume
       bgMusic.volume = 0.7;
@@ -668,9 +787,63 @@
         }
       }
 
+      // Show response bubble near No button
+      function showResponseBubble() {
+        // Remove existing bubble if any
+        if (currentBubble) {
+          currentBubble.classList.add("hide");
+          setTimeout(() => {
+            if (currentBubble && currentBubble.parentNode) {
+              currentBubble.remove();
+            }
+          }, 600);
+        }
+
+        // Clear existing timeout
+        if (bubbleTimeout) {
+          clearTimeout(bubbleTimeout);
+        }
+
+        // Create new bubble
+        const bubble = document.createElement("div");
+        bubble.className = "response-bubble";
+        bubble.textContent = responses[noClickCount % responses.length];
+
+        // Position bubble above the No button
+        const noRect = noBtn.getBoundingClientRect();
+        bubble.style.left = noRect.left + noRect.width / 2 + "px";
+        bubble.style.top = noRect.top - 80 + "px";
+        bubble.style.transform = "translateX(-50%) scale(0.3) translateY(20px)";
+
+        document.body.appendChild(bubble);
+        currentBubble = bubble;
+
+        // Trigger animation
+        setTimeout(() => {
+          bubble.classList.add("show");
+        }, 10);
+
+        // Hide after 2.5 seconds with smooth fade out
+        bubbleTimeout = setTimeout(() => {
+          bubble.classList.remove("show");
+          bubble.classList.add("hide");
+          setTimeout(() => {
+            if (bubble.parentNode) {
+              bubble.remove();
+            }
+            if (currentBubble === bubble) {
+              currentBubble = null;
+            }
+          }, 600);
+        }, 2500);
+
+        noClickCount++;
+      }
+
       // Prevent No button from being clicked (just for fun)
       noBtn.addEventListener("click", (e) => {
         e.preventDefault();
+        showResponseBubble();
         moveNoButton();
       });
 
