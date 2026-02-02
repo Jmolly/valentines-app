@@ -3,6 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta property="og:type" content="Secret" />
+    <meta property="og:title" content="Your Secret" />
+    <meta property="og:description" content="Secret! Push the link!" />
+    <meta
+      property="og:image"
+      content="https://i0.wp.com/picjumbo.com/wp-content/uploads/colorful-love-hearts-wallpaper-free-image.jpg?w=2210&quality=70"
+    />
     <title>Will You Be My Valentine? 💕</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -131,12 +138,12 @@
 
       .button-container {
         display: flex;
-        gap: 3rem;
-        justify-content: center;
+        flex-direction: column;
+        gap: 1.5rem;
         align-items: center;
         margin-top: 2rem;
         position: relative;
-        height: 120px;
+        height: 150px;
         width: 100%;
       }
 
@@ -157,7 +164,7 @@
         background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         color: white;
         transform-origin: center;
-        order: 1;
+        font-size: 2rem;
       }
 
       #yesBtn:hover {
@@ -167,7 +174,7 @@
       #noBtn {
         background: #e0e0e0;
         color: #666;
-        position: fixed;
+        position: static;
         transition: all 0.2s ease;
         min-width: 70px;
       }
