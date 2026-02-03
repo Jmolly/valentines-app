@@ -286,6 +286,8 @@ button {
   pointer-events: none;
   font-size: 1rem;
   animation: sparkleFloat 2s ease-out forwards;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 @keyframes sparkleFloat {
@@ -546,6 +548,76 @@ button {
   }
   50% {
     transform: translateY(-15px) rotate(2deg);
+  }
+}
+
+.explosion-emoji {
+  position: fixed;
+  pointer-events: none;
+  animation: emojiExplosion 2.5s ease-out forwards;
+  z-index: 1000;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+@keyframes emojiExplosion {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.3) rotate(0deg);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(calc(var(--tx) * 0.3), calc(var(--ty) * 0.3))
+      scale(1.2) rotate(180deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty)) scale(0.5)
+      rotate(720deg);
+  }
+}
+
+.heart-image {
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease;
+}
+
+.heart-image:hover {
+  transform: scale(1.1);
+}
+
+.heart-image:active {
+  transform: scale(0.95);
+}
+
+.heart-image.heart-clicked {
+  animation: heartBounceClick 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  filter: drop-shadow(0 0 20px rgba(255, 105, 180, 0.8))
+    drop-shadow(0 0 40px rgba(255, 192, 203, 0.6))
+    drop-shadow(0 0 60px rgba(255, 20, 147, 0.4));
+  will-change: transform, filter;
+}
+
+@keyframes heartBounceClick {
+  0% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-50px);
+  }
+  60% {
+    transform: translateY(-45px);
+  }
+  75% {
+    transform: translateY(-10px);
+  }
+  90% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0);
   }
 }
 

@@ -431,6 +431,266 @@ function createTwinkleStar() {
   setTimeout(() => star.remove(), 2000);
 }
 
+// Reuse AudioContext for better performance
+let sharedAudioContext = null;
+let isExplosionActive = false;
+let lastExplosionTime = 0;
+const EXPLOSION_COOLDOWN = 800; // milliseconds between explosions
+
+function getAudioContext() {
+  if (!sharedAudioContext) {
+    sharedAudioContext = new (window.AudioContext ||
+      window.webkitAudioContext)();
+  }
+  return sharedAudioContext;
+}
+
+// Function to play firework sound
+function playFireworkSound() {
+  const audioContext = getAudioContext();
+
+  // Launch sound
+  const launchOscillator = audioContext.createOscillator();
+  const launchGain = audioContext.createGain();
+  launchOscillator.connect(launchGain);
+  launchGain.connect(audioContext.destination);
+  launchOscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+  launchOscillator.frequency.exponentialRampToValueAtTime(
+    600,
+    audioContext.currentTime + 0.3,
+  );
+  launchGain.gain.setValueAtTime(0.3, audioContext.currentTime);
+  launchGain.gain.exponentialRampToValueAtTime(
+    0.01,
+    audioContext.currentTime + 0.3,
+  );
+  launchOscillator.start(audioContext.currentTime);
+  launchOscillator.stop(audioContext.currentTime + 0.3);
+
+  // Explosion sound
+  setTimeout(() => {
+    // Create white noise for explosion
+    const bufferSize = audioContext.sampleRate * 0.5;
+    const buffer = audioContext.createBuffer(
+      1,
+      bufferSize,
+      audioContext.sampleRate,
+    );
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+
+    const noise = audioContext.createBufferSource();
+    noise.buffer = buffer;
+
+    const noiseFilter = audioContext.createBiquadFilter();
+    noiseFilter.type = "highpass";
+    noiseFilter.frequency.value = 1000;
+
+    const noiseGain = audioContext.createGain();
+    noiseGain.gain.setValueAtTime(0.4, audioContext.currentTime);
+    noiseGain.gain.exponentialRampToValueAtTime(
+      0.01,
+      audioContext.currentTime + 0.5,
+    );
+
+    noise.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(audioContext.destination);
+
+    noise.start(audioContext.currentTime);
+    noise.stop(audioContext.currentTime + 0.5);
+
+    // Add sparkle sounds
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => {
+        const sparkleOsc = audioContext.createOscillator();
+        const sparkleGain = audioContext.createGain();
+        sparkleOsc.connect(sparkleGain);
+        sparkleGain.connect(audioContext.destination);
+        sparkleOsc.frequency.setValueAtTime(
+          1500 + Math.random() * 1000,
+          audioContext.currentTime,
+        );
+        sparkleGain.gain.setValueAtTime(0.15, audioContext.currentTime);
+        sparkleGain.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioContext.currentTime + 0.2,
+        );
+        sparkleOsc.start(audioContext.currentTime);
+        sparkleOsc.stop(audioContext.currentTime + 0.2);
+      }, i * 50);
+    }
+  }, 250);
+}
+
+// Interactive heart explosion on celebration page
+function createHeartExplosion(x, y) {
+  // Throttle explosions to prevent performance issues
+  const now = Date.now();
+  if (isExplosionActive || now - lastExplosionTime < EXPLOSION_COOLDOWN) {
+    return;
+  }
+
+  isExplosionActive = true;
+  lastExplosionTime = now;
+
+  // Reset flag after animation completes
+  setTimeout(() => {
+    isExplosionActive = false;
+  }, EXPLOSION_COOLDOWN);
+
+  // Play firework sound
+  playFireworkSound();
+
+  const emojis = [
+    "😻",
+    "😺",
+    "🐱",
+    "💕",
+    "💖",
+    "💗",
+    "💓",
+    "💝",
+    "❤️",
+    "💞",
+    "💘",
+    "🌸",
+    "🌺",
+    "🌹",
+    "🌷",
+    "💮",
+    "🌼",
+    "✨",
+    "⭐",
+    "🌟",
+    "💫",
+  ];
+
+  // Create main explosion burst (50 emojis in a circle) - optimized!
+  for (let i = 0; i < 50; i++) {
+    setTimeout(() => {
+      const emoji = document.createElement("div");
+      emoji.className = "explosion-emoji";
+      emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+      const size = Math.random() * 2.5 + 1.5;
+      emoji.style.fontSize = size + "rem";
+      emoji.style.left = x + "px";
+      emoji.style.top = y + "px";
+
+      // Calculate direction (full circle)
+      const angle = (Math.PI * 2 * i) / 50 + (Math.random() - 0.5) * 0.3;
+      const velocity = Math.random() * 300 + 250;
+      const tx = Math.cos(angle) * velocity;
+      const ty = Math.sin(angle) * velocity;
+
+      emoji.style.setProperty("--tx", tx + "px");
+      emoji.style.setProperty("--ty", ty + "px");
+
+      document.body.appendChild(emoji);
+
+      setTimeout(() => emoji.remove(), 2500);
+    }, i * 10);
+  }
+
+  // Add sparkle burst - optimized!
+  for (let i = 0; i < 25; i++) {
+    setTimeout(() => {
+      const sparkle = document.createElement("div");
+      sparkle.className = "sparkle";
+      sparkle.textContent = ["✨", "⭐", "🌟", "💫"][
+        Math.floor(Math.random() * 4)
+      ];
+      sparkle.style.left = x + (Math.random() - 0.5) * 200 + "px";
+      sparkle.style.top = y + (Math.random() - 0.5) * 200 + "px";
+      sparkle.style.fontSize = Math.random() * 2 + 1 + "rem";
+
+      document.body.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 2000);
+    }, i * 25);
+  }
+
+  // Add secondary explosions for bigger firework effect
+  setTimeout(() => {
+    for (let i = 0; i < 20; i++) {
+      setTimeout(() => {
+        const emoji = document.createElement("div");
+        emoji.className = "explosion-emoji";
+        emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+        emoji.style.fontSize = Math.random() * 2 + 1 + "rem";
+        emoji.style.left = x + (Math.random() - 0.5) * 250 + "px";
+        emoji.style.top = y + (Math.random() - 0.5) * 250 + "px";
+
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * 250 + 120;
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity;
+
+        emoji.style.setProperty("--tx", tx + "px");
+        emoji.style.setProperty("--ty", ty + "px");
+
+        document.body.appendChild(emoji);
+        setTimeout(() => emoji.remove(), 2000);
+      }, i * 18);
+    }
+  }, 250);
+
+  // Add third wave for extra firework effect
+  setTimeout(() => {
+    for (let i = 0; i < 15; i++) {
+      setTimeout(() => {
+        const emoji = document.createElement("div");
+        emoji.className = "explosion-emoji";
+        emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+        emoji.style.fontSize = Math.random() * 1.8 + 1.2 + "rem";
+        emoji.style.left = x + (Math.random() - 0.5) * 300 + "px";
+        emoji.style.top = y + (Math.random() - 0.5) * 300 + "px";
+
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * 200 + 100;
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity;
+
+        emoji.style.setProperty("--tx", tx + "px");
+        emoji.style.setProperty("--ty", ty + "px");
+
+        document.body.appendChild(emoji);
+        setTimeout(() => emoji.remove(), 2000);
+      }, i * 20);
+    }
+  }, 500);
+}
+
+// Add click handler to celebration heart
+document.addEventListener("DOMContentLoaded", () => {
+  // Find both heart images in celebration section
+  const celebrationHearts = document.querySelectorAll(
+    "#celebration .heart-image",
+  );
+
+  celebrationHearts.forEach((heart) => {
+    heart.style.cursor = "pointer";
+    heart.addEventListener("click", (e) => {
+      // Add bounce and glow animation
+      heart.classList.add("heart-clicked");
+
+      // Remove class after animation completes
+      setTimeout(() => {
+        heart.classList.remove("heart-clicked");
+      }, 600);
+
+      const rect = heart.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height / 2;
+      createHeartExplosion(x, y);
+    });
+  });
+});
+
 // Stop continuous animations when music is paused
 bgMusic.addEventListener("pause", () => {
   continuousAnimationsRunning = false;
