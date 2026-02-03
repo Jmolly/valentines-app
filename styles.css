@@ -104,7 +104,9 @@ h1 {
 .main-photo {
   width: 120px;
   height: 120px;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
+  object-position: center;
   border-radius: 50%;
   border: 2px solid #f6a5c1;
   box-shadow: 0 5px 20px rgba(233, 30, 99, 0.3);
@@ -559,6 +561,7 @@ button {
   .main-photo {
     width: 80px;
     height: 80px;
+    aspect-ratio: 1 / 1;
   }
 
   .heart-image {
