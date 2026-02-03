@@ -444,7 +444,7 @@ let clickCounterElement = null;
 let clickTimerElement = null;
 let isMegaComboActive = false; // Block tracking during mega combo
 const RAPID_CLICK_THRESHOLD = 10; // clicks needed
-const RAPID_CLICK_TIME = 3000; // 3 seconds
+const RAPID_CLICK_TIME = 1500; // 1.5 seconds
 
 function getAudioContext() {
   if (!sharedAudioContext) {
@@ -823,17 +823,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Start timer on first click
       if (rapidClickCount === 1) {
-        let timeLeft = RAPID_CLICK_TIME;
         const startTime = Date.now();
 
         rapidClickTimer = setInterval(() => {
           const elapsed = Date.now() - startTime;
-          timeLeft = RAPID_CLICK_TIME - elapsed;
+          const timeLeft = RAPID_CLICK_TIME - elapsed;
 
           if (timeLeft <= 0) {
             resetRapidClicks();
-          } else {
-            updateClickTimer(timeLeft / 1000);
           }
         }, 50); // Update every 50ms for smooth countdown
       }

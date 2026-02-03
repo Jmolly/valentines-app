@@ -653,31 +653,6 @@ button {
   }
 }
 
-/* Rapid click timer */
-.rapid-click-timer {
-  position: fixed;
-  top: calc(50% + 100px);
-  left: 50%;
-  transform: translate(-50%, 0) scale(0);
-  font-size: 4rem;
-  font-weight: 700;
-  color: #ff9800;
-  text-shadow:
-    0 0 15px rgba(255, 152, 0, 0.8),
-    0 0 30px rgba(255, 152, 0, 0.6),
-    3px 3px 8px rgba(0, 0, 0, 0.5);
-  pointer-events: none;
-  z-index: 10000;
-  opacity: 0;
-  transition: all 0.3s ease;
-  font-family: "Poppins", sans-serif;
-}
-
-.rapid-click-timer.show {
-  opacity: 1;
-  transform: translate(-50%, 0) scale(1);
-}
-
 /* Mega explosion emoji */
 .mega-explosion-emoji {
   position: fixed;
@@ -826,12 +801,7 @@ button {
     font-size: 5rem;
   }
 
-  .rapid-click-timer {
-    font-size: 2.5rem;
-    top: calc(50% + 70px);
-  }
-
   .mega-text {
-    font-size: 3rem;
+    font-size: 1rem;
   }
 }
