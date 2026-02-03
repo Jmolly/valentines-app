@@ -2,6 +2,8 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -576,6 +578,8 @@ button {
   cursor: pointer;
   user-select: none;
   transition: transform 0.2s ease;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .heart-image:hover {
