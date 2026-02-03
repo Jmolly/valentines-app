@@ -437,6 +437,15 @@ let isExplosionActive = false;
 let lastExplosionTime = 0;
 const EXPLOSION_COOLDOWN = 800; // milliseconds between explosions
 
+// Rapid click tracking
+let rapidClickCount = 0;
+let rapidClickTimer = null;
+let clickCounterElement = null;
+let clickTimerElement = null;
+let isMegaComboActive = false; // Block tracking during mega combo
+const RAPID_CLICK_THRESHOLD = 10; // clicks needed
+const RAPID_CLICK_TIME = 3000; // 3 seconds
+
 function getAudioContext() {
   if (!sharedAudioContext) {
     sharedAudioContext = new (window.AudioContext ||
@@ -665,6 +674,122 @@ function createHeartExplosion(x, y) {
   }, 500);
 }
 
+// Function to create/update click counter display
+function updateClickCounter() {
+  if (!clickCounterElement) {
+    clickCounterElement = document.createElement("div");
+    clickCounterElement.className = "rapid-click-counter";
+    document.body.appendChild(clickCounterElement);
+  }
+  clickCounterElement.textContent = `${rapidClickCount}/${RAPID_CLICK_THRESHOLD}`;
+  clickCounterElement.classList.add("show");
+}
+
+// Function to create/update timer display
+function updateClickTimer(secondsLeft) {
+  if (!clickTimerElement) {
+    clickTimerElement = document.createElement("div");
+    clickTimerElement.className = "rapid-click-timer";
+    document.body.appendChild(clickTimerElement);
+  }
+  clickTimerElement.textContent = `${secondsLeft.toFixed(1)}s`;
+  clickTimerElement.classList.add("show");
+}
+
+// Function to hide rapid click UI
+function hideRapidClickUI() {
+  if (clickCounterElement) {
+    clickCounterElement.classList.remove("show");
+  }
+  if (clickTimerElement) {
+    clickTimerElement.classList.remove("show");
+  }
+}
+
+// Function to reset rapid click tracking
+function resetRapidClicks() {
+  rapidClickCount = 0;
+  if (rapidClickTimer) {
+    clearInterval(rapidClickTimer);
+    rapidClickTimer = null;
+  }
+  hideRapidClickUI();
+}
+
+// Optimized mega explosion with fewer elements
+function createMegaExplosion(x, y) {
+  // Block new combo tracking during animation
+  isMegaComboActive = true;
+
+  const emojis = [
+    "😻",
+    "😺",
+    "🐱",
+    "💕",
+    "💖",
+    "💗",
+    "💓",
+    "💝",
+    "❤️",
+    "💞",
+    "💘",
+    "🌸",
+    "🌺",
+    "🌹",
+    "🌷",
+    "💮",
+    "🌼",
+    "✨",
+    "⭐",
+    "🌟",
+    "💫",
+  ];
+
+  // Play enhanced sound
+  playFireworkSound();
+  setTimeout(() => playFireworkSound(), 150);
+  setTimeout(() => playFireworkSound(), 300);
+
+  // Create large central burst (60 emojis total - manageable)
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      const emoji = document.createElement("div");
+      emoji.className = "mega-explosion-emoji";
+      emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+      const size = Math.random() * 3 + 2; // Larger emojis
+      emoji.style.fontSize = size + "rem";
+      emoji.style.left = x + "px";
+      emoji.style.top = y + "px";
+
+      const angle = (Math.PI * 2 * i) / 60 + (Math.random() - 0.5) * 0.4;
+      const velocity = Math.random() * 500 + 350; // Faster
+      const tx = Math.cos(angle) * velocity;
+      const ty = Math.sin(angle) * velocity;
+
+      emoji.style.setProperty("--tx", tx + "px");
+      emoji.style.setProperty("--ty", ty + "px");
+
+      document.body.appendChild(emoji);
+      setTimeout(() => emoji.remove(), 3000);
+    }, i * 8);
+  }
+
+  // Add mega text announcement
+  const megaText = document.createElement("div");
+  megaText.className = "mega-text";
+  megaText.textContent = "MY LOVE FOR YOU IS HUGE! 💕";
+  megaText.style.left = x + "px";
+  megaText.style.top = y - 100 + "px";
+  document.body.appendChild(megaText);
+  setTimeout(() => megaText.remove(), 2500);
+
+  // Unblock combo tracking after animation completes (2.5s)
+  setTimeout(() => {
+    isMegaComboActive = false;
+  }, 2500);
+}
+
 // Add click handler to celebration heart
 document.addEventListener("DOMContentLoaded", () => {
   // Find both heart images in celebration section
@@ -686,6 +811,42 @@ document.addEventListener("DOMContentLoaded", () => {
       const rect = heart.getBoundingClientRect();
       const x = rect.left + rect.width / 2;
       const y = rect.top + rect.height / 2;
+
+      // Block all clicks during mega combo animation
+      if (isMegaComboActive) {
+        return; // Ignore all clicks during mega combo
+      }
+
+      // Track rapid clicks
+      rapidClickCount++;
+      updateClickCounter();
+
+      // Start timer on first click
+      if (rapidClickCount === 1) {
+        let timeLeft = RAPID_CLICK_TIME;
+        const startTime = Date.now();
+
+        rapidClickTimer = setInterval(() => {
+          const elapsed = Date.now() - startTime;
+          timeLeft = RAPID_CLICK_TIME - elapsed;
+
+          if (timeLeft <= 0) {
+            resetRapidClicks();
+          } else {
+            updateClickTimer(timeLeft / 1000);
+          }
+        }, 50); // Update every 50ms for smooth countdown
+      }
+
+      // Check if threshold reached
+      if (rapidClickCount >= RAPID_CLICK_THRESHOLD) {
+        // MEGA EXPLOSION!
+        createMegaExplosion(x, y);
+        resetRapidClicks();
+        return; // Don't create normal explosion
+      }
+
+      // Normal explosion
       createHeartExplosion(x, y);
     });
   });
