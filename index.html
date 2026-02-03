@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💕</text></svg>">
+
     <!-- Primary Meta Tags -->
     <title>Will You Be My Valentine? 💕</title>
     <meta name="title" content="Will You Be My Valentine? 💕" />
@@ -20,10 +23,10 @@
       property="og:description"
       content="I have a very special question for you... 💖"
     />
-    <meta property="og:image" content="https://YOURSITE.com/IMG_0842.JPG" />
+    <meta property="og:image" content="https://YOURSITE.com/cat-valentine-1.jpg" />
     <meta
       property="og:image:secure_url"
-      content="https://YOURSITE.com/IMG_0842.JPG"
+      content="https://YOURSITE.com/cat-valentine-1.jpg"
     />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
@@ -37,7 +40,7 @@
       name="twitter:description"
       content="I have a very special question for you... 💖"
     />
-    <meta name="twitter:image" content="https://YOURSITE.com/IMG_0842.JPG" />
+    <meta name="twitter:image" content="https://YOURSITE.com/cat-valentine-1.jpg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -140,9 +143,44 @@
         }
       }
 
+      .main-photos-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        margin: 1rem 0;
+      }
+
+      .main-photo {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #f6a5c1;
+        box-shadow: 0 5px 20px rgba(233, 30, 99, 0.3);
+        animation: photoFloat 3s ease-in-out infinite;
+      }
+
+      .main-photo-left {
+        animation-delay: 0s;
+      }
+
+      .main-photo-right {
+        animation-delay: 0.5s;
+      }
+
+      @keyframes photoFloat {
+        0%,
+        100% {
+          transform: translateY(0) scale(1);
+        }
+        50% {
+          transform: translateY(-10px) scale(1.05);
+        }
+      }
+
       .heart-image {
         font-size: 8rem;
-        margin: 1rem 0;
         animation: float 3s ease-in-out infinite;
       }
 
@@ -408,6 +446,7 @@
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         transition: all 0.3s ease;
         z-index: 1000;
+        padding: 1rem;
       }
 
       .music-toggle:hover {
@@ -561,6 +600,15 @@
           font-size: 2rem;
         }
 
+        .main-photos-container {
+          gap: 1rem;
+        }
+
+        .main-photo {
+          width: 80px;
+          height: 80px;
+        }
+
         .heart-image {
           font-size: 5rem;
         }
@@ -604,7 +652,11 @@
   <body>
     <div class="container" id="questionContainer">
       <h1>Will You Be My Valentine?</h1>
-      <div class="heart-image">💖</div>
+      <div class="main-photos-container">
+        <img src="profile-left.jpg" alt="Me" class="main-photo main-photo-left" />
+        <div class="heart-image">💖</div>
+        <img src="profile-right.jpg" alt="Her" class="main-photo main-photo-right" />
+      </div>
       <p>I promise to make every day as sweet as this moment!</p>
       <div class="button-container">
         <button id="yesBtn">Yes! 💕</button>
@@ -615,7 +667,11 @@
     <div class="celebration hidden" id="celebration">
       <h1>Yay! You made my day! 💕</h1>
       <p>I'm the luckiest person in the world!</p>
-      <div class="heart-image">💝</div>
+      <div class="main-photos-container">
+        <img src="profile-left.jpg" alt="Me" class="main-photo main-photo-left" />
+        <div class="heart-image">💝</div>
+        <img src="profile-right.jpg" alt="Her" class="main-photo main-photo-right" />
+      </div>
       <div class="cats-container">
         <img src="cat-valentine-1.jpg" alt="Cute cat" class="cat-image" />
         <img src="cat-valentine-2.jpg" alt="Cute cat" class="cat-image" />
