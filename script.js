@@ -782,12 +782,12 @@ function createMegaExplosion(x, y) {
   megaText.style.left = x + "px";
   megaText.style.top = y - 100 + "px";
   document.body.appendChild(megaText);
-  setTimeout(() => megaText.remove(), 2500);
+  setTimeout(() => megaText.remove(), 4500);
 
-  // Unblock combo tracking after animation completes (2.5s)
+  // Unblock combo tracking after animation completes (4.5s)
   setTimeout(() => {
     isMegaComboActive = false;
-  }, 2500);
+  }, 4500);
 }
 
 // Add click handler to celebration heart
