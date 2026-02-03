@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💕</text></svg>">
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💕</text></svg>"
+    />
 
     <!-- Primary Meta Tags -->
     <title>Will You Be My Valentine? 💕</title>
@@ -239,9 +242,11 @@
       #noBtn {
         background: #e0e0e0;
         color: #666;
-        position: static;
+        position: fixed;
         transition: all 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         min-width: 70px;
+        z-index: 1001;
+        width: fit-content;
       }
 
       .hidden {
@@ -627,9 +632,11 @@
         }
 
         .response-bubble {
-          font-size: 2.8rem;
-          padding: 2rem 2.5rem;
-          max-width: 500px;
+          font-size: 2rem;
+          padding: 1.5rem 2rem;
+          max-width: 90%;
+          width: fit-content;
+          min-width: 280px;
         }
 
         .response-bubble::after {
@@ -699,8 +706,6 @@
       let continuousAnimationsRunning = false;
       let animationIntervals = [];
       let noClickCount = 0;
-      let currentBubble = null;
-      let bubbleTimeout = null;
       let canMove = true;
       let moveTimeout = null;
 
@@ -713,14 +718,14 @@
       // Set initial volume
       bgMusic.volume = 0.7;
 
-      // Initialize No button position on the right of Yes button
+      // Initialize No button position below Yes button
       function initNoButtonPosition() {
         const yesRect = yesBtn.getBoundingClientRect();
         const btnWidth = noBtn.offsetWidth;
 
-        // Position to the right of the Yes button with some spacing
-        const leftPos = yesRect.right + 60;
-        const topPos = yesRect.top;
+        // Position below the Yes button, centered
+        const leftPos = yesRect.left + yesRect.width / 2 - btnWidth / 2;
+        const topPos = yesRect.bottom + 30; // 30px gap below Yes button
 
         noBtn.style.left = `${leftPos}px`;
         noBtn.style.top = `${topPos}px`;
@@ -922,21 +927,6 @@
 
       // Show response bubble near No button
       function showResponseBubble() {
-        // Remove existing bubble if any
-        if (currentBubble) {
-          currentBubble.classList.add("hide");
-          setTimeout(() => {
-            if (currentBubble && currentBubble.parentNode) {
-              currentBubble.remove();
-            }
-          }, 600);
-        }
-
-        // Clear existing timeout
-        if (bubbleTimeout) {
-          clearTimeout(bubbleTimeout);
-        }
-
         // Create new bubble
         const bubble = document.createElement("div");
         bubble.className = "response-bubble";
@@ -949,23 +939,19 @@
         bubble.style.transform = "translateX(-50%) scale(0.3) translateY(20px)";
 
         document.body.appendChild(bubble);
-        currentBubble = bubble;
 
         // Trigger animation
         setTimeout(() => {
           bubble.classList.add("show");
         }, 10);
 
-        // Hide after 2.5 seconds with smooth fade out
-        bubbleTimeout = setTimeout(() => {
+        // Each bubble has its own independent timer
+        setTimeout(() => {
           bubble.classList.remove("show");
           bubble.classList.add("hide");
           setTimeout(() => {
             if (bubble.parentNode) {
               bubble.remove();
-            }
-            if (currentBubble === bubble) {
-              currentBubble = null;
             }
           }, 600);
         }, 2500);
